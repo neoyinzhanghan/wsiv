@@ -7,25 +7,23 @@ const ImageViewer = ({ imageUrl }) => {
   const [viewer, setViewer] = useState(null);
 
   useEffect(() => {
-    // This function runs only in the browser (client-side)
-    const initializeViewer = async () => {
-      if (typeof window !== "undefined" && imageUrl && viewerRef.current && !viewer) {
-        // Dynamically import OpenSeadragon only on the client-side
-        const OpenSeadragon = (await import("openseadragon")).default;
-
-        const osdViewer = OpenSeadragon({
-          element: viewerRef.current,
-          prefixUrl: "/openseadragon/images/",
-          tileSources: {
-            type: "image",
-            url: imageUrl,
-          },
-        });
-        setViewer(osdViewer);
-      }
-    };
-
-    initializeViewer();
+    // This check ensures that the code only runs in the browser
+    if (typeof window !== "undefined") {
+      // Dynamically import OpenSeadragon only in the browser environment
+      import("openseadragon").then(OpenSeadragon => {
+        if (imageUrl && viewerRef.current && !viewer) {
+          const osdViewer = OpenSeadragon.default({
+            element: viewerRef.current,
+            prefixUrl: "/openseadragon/images/",
+            tileSources: {
+              type: "image",
+              url: imageUrl,
+            },
+          });
+          setViewer(osdViewer);
+        }
+      });
+    }
   }, [imageUrl]);
 
   return <div ref={viewerRef} style={{ width: "100%", height: "500px" }} />;

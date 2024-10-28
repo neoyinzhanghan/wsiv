@@ -3,8 +3,9 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
+// Dynamically import the ImageViewer without SSR (Server-Side Rendering)
 const ImageViewer = dynamic(() => import("../components/ImageViewer"), {
-  ssr: false, // Disable server-side rendering
+  ssr: false,
 });
 
 export default function Home() {
