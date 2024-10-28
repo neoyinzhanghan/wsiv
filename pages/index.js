@@ -34,7 +34,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Upload Error:", errorData.error); // Client-side error logging
+        console.error("Upload Error:", errorData); // Log entire error data
         alert(`Upload failed: ${errorData.error}`);
         return;
       }
