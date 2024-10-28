@@ -10,6 +10,8 @@ export default function Home() {
   };
 
   const handleUpload = async () => {
+    if (!selectedFile) return;
+
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -25,7 +27,7 @@ export default function Home() {
   return (
     <div>
       <h1>Whole Slide Image Viewer</h1>
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" onChange={handleFileChange} accept=".svs,.ndpi" />
       <button onClick={handleUpload}>Upload and View</button>
 
       {imagePath && <ImageViewer imageUrl={imagePath} />}

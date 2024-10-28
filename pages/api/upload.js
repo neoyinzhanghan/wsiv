@@ -18,6 +18,7 @@ const uploadHandler = async (req, res) => {
   const form = new formidable.IncomingForm({
     uploadDir,
     keepExtensions: true,
+    maxFileSize: 5 * 1024 * 1024 * 1024, // 5 GB limit
   });
 
   form.parse(req, (err, fields, files) => {
