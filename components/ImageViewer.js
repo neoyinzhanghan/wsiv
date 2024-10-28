@@ -1,20 +1,18 @@
 // File: components/ImageViewer.js
 
 import { useEffect, useRef, useState } from "react";
-let OpenSeadragon = null;
 
 const ImageViewer = ({ imageUrl }) => {
   const viewerRef = useRef(null);
   const [viewer, setViewer] = useState(null);
 
   useEffect(() => {
-    // Dynamically import OpenSeadragon to only load it on the client-side
+    // This function runs only in the browser (client-side)
     const initializeViewer = async () => {
       if (typeof window !== "undefined" && imageUrl && viewerRef.current && !viewer) {
-        if (!OpenSeadragon) {
-          OpenSeadragon = (await import("openseadragon")).default;
-        }
-        
+        // Dynamically import OpenSeadragon only on the client-side
+        const OpenSeadragon = (await import("openseadragon")).default;
+
         const osdViewer = OpenSeadragon({
           element: viewerRef.current,
           prefixUrl: "/openseadragon/images/",
