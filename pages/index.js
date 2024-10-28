@@ -1,3 +1,5 @@
+// File: pages/index.js
+
 import { useState } from "react";
 import ImageViewer from "../components/ImageViewer";
 
@@ -6,7 +8,16 @@ export default function Home() {
   const [imagePath, setImagePath] = useState(null);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    const validTypes = [".svs", ".ndpi"];
+    const fileType = file.name.slice(file.name.lastIndexOf("."));
+
+    if (!validTypes.includes(fileType.toLowerCase())) {
+      alert("Invalid file type. Please upload a .svs or .ndpi file.");
+      setSelectedFile(null);
+    } else {
+      setSelectedFile(file);
+    }
   };
 
   const handleUpload = async () => {
@@ -15,13 +26,26 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const result = await response.json();
-    setImagePath(result.filePath);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Upload Error:", errorData.error); // Client-side error logging
+        alert(`Upload failed: ${errorData.error}`);
+        return;
+      }
+
+      const result = await response.json();
+      console.log("Upload successful. File path:", result.filePath); // Log success
+      setImagePath(result.filePath);
+    } catch (error) {
+      console.error("Upload Failed:", error);
+      alert(`Upload failed: ${error.message}`);
+    }
   };
 
   return (
