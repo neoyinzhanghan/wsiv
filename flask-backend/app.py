@@ -17,24 +17,27 @@ def get_slide_path(slide_name):
 slide = None
 
 @app.route('/upload', methods=['POST'])
-def upload_slide():
-    global slide
-    if 'file' not in request.files:
-        return jsonify(success=False, error="No file part"), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify(success=False, error="No selected file"), 400
+def upload_file():
+    try:
+        if 'file' not in request.files:
+            return "No file part in the request", 400  # Bad Request status code
 
-    if file:
-        slide_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(slide_path)
-        
-        try:
-            slide = openslide.OpenSlide(slide_path)
-            return jsonify(success=True, slide_name=file.filename, width=slide.dimensions[0], height=slide.dimensions[1], max_level=slide.level_count - 1)
-        except Exception as e:
-            return jsonify(success=False, error=str(e)), 500
+        file = request.files['file']
+        if file.filename == '':
+            return "No selected file", 400  # Bad Request status code
+
+        # Add your supported file extensions
+        if not (file.filename.endswith('.svs') or file.filename.endswith('.ndpi')):
+            return "Unsupported file type", 400  # Bad Request status code
+
+        # Save the file in your desired location
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+        return "File uploaded successfully", 200
+
+    except Exception as e:
+        app.logger.error(f"Error during file upload: {e}")
+        return "An error occurred during file upload", 500  # Internal Server Error
+
 
 @app.route('/tile/<int:level>/<int:x>/<int:y>/', methods=['GET'])
 def get_tile(level, x, y):
