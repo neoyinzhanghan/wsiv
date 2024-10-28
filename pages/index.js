@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ImageViewer from "../components/ImageViewer";
+import '../styles/globals.css';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
