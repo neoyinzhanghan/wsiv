@@ -29,13 +29,12 @@ const uploadHandler = async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    console.log("Files received:", files); // Log received files
-
     const file = files.file[0];
     const relativePath = `/uploads/${file.newFilename}`;
-    console.log("File saved at:", relativePath); // Log where file is saved
+    
+    console.log("File saved at:", relativePath); // Log where the file is saved
 
-    res.status(200).json({ filePath: relativePath });
+    res.status(200).json({ message: "Upload successful", filePath: relativePath });
   });
 };
 
