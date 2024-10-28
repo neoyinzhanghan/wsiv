@@ -1,3 +1,5 @@
+// File: components/ImageViewer.js
+
 import OpenSeadragon from "openseadragon";
 import { useEffect, useRef, useState } from "react";
 
@@ -6,7 +8,7 @@ const ImageViewer = ({ imageUrl }) => {
   const [viewer, setViewer] = useState(null);
 
   useEffect(() => {
-    if (imageUrl && viewerRef.current && !viewer) {
+    if (typeof window !== "undefined" && imageUrl && viewerRef.current && !viewer) {
       const osdViewer = OpenSeadragon({
         element: viewerRef.current,
         prefixUrl: "/openseadragon/images/",

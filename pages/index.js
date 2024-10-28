@@ -1,11 +1,15 @@
 // File: pages/index.js
 
 import { useState } from "react";
-import ImageViewer from "../components/ImageViewer";
+import dynamic from "next/dynamic";
+
+const ImageViewer = dynamic(() => import("../components/ImageViewer"), {
+  ssr: false, // Disable server-side rendering
+});
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [imagePath, setImagePath] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState("");
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -34,27 +38,27 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Upload Error:", errorData); // Log entire error data
-        alert(`Upload failed: ${errorData.error}`);
+        console.error("Upload Error:", errorData.error); // Client-side error logging
+        setUploadStatus(`Upload failed: ${errorData.error}`);
         return;
       }
 
       const result = await response.json();
       console.log("Upload successful. File path:", result.filePath); // Log success
-      setImagePath(result.filePath);
+      setUploadStatus("Upload successful!");
     } catch (error) {
       console.error("Upload Failed:", error);
-      alert(`Upload failed: ${error.message}`);
+      setUploadStatus(`Upload failed: ${error.message}`);
     }
   };
 
   return (
     <div>
-      <h1>Whole Slide Image Viewer</h1>
+      <h1>Whole Slide Image Uploader</h1>
       <input type="file" onChange={handleFileChange} accept=".svs,.ndpi" />
-      <button onClick={handleUpload}>Upload and View</button>
+      <button onClick={handleUpload}>Upload</button>
 
-      {imagePath && <ImageViewer imageUrl={imagePath} />}
+      {uploadStatus && <p>{uploadStatus}</p>}
     </div>
   );
 }
