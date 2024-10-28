@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import OpenSeadragon from 'openseadragon';
+import dynamic from 'next/dynamic';
+
+// Dynamically import OpenSeadragon to avoid server-side execution issues
+const OpenSeadragon = dynamic(() => import('openseadragon'), { ssr: false });
 
 export default function Home() {
     const [slideData, setSlideData] = useState(null);
@@ -54,6 +57,12 @@ export default function Home() {
             alert('Error uploading file');
         }
     };
+
+    useEffect(() => {
+        if (slideData && !viewer) {
+            handleUpload();
+        }
+    }, [slideData]);
 
     return (
         <div style={{ padding: '20px' }}>
