@@ -1,12 +1,6 @@
 // File: pages/index.js
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
-
-// Dynamically import the ImageViewer without SSR (Server-Side Rendering)
-const ImageViewer = dynamic(() => import("../components/ImageViewer"), {
-  ssr: false,
-});
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,13 +31,15 @@ export default function Home() {
         body: formData,
       });
 
+      // Check if the response is not okay or if content-type is not JSON
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Upload Error:", errorData.error); // Client-side error logging
-        setUploadStatus(`Upload failed: ${errorData.error}`);
+        const errorMessage = await response.text();
+        console.error("Upload Error:", errorMessage);
+        setUploadStatus(`Upload failed: ${errorMessage}`);
         return;
       }
 
+      // Try to parse the JSON response
       const result = await response.json();
       console.log("Upload successful. File path:", result.filePath); // Log success
       setUploadStatus("Upload successful!");
