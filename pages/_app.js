@@ -1,6 +1,6 @@
 // File: pages/_app.js
 
-import '../styles/globals.css'; // Import global CSS here
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;

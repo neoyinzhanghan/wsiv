@@ -1,5 +1,5 @@
 {
-    "name": "wsi-viewer",
+    "name": "image-uploader",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -11,8 +11,8 @@
       "next": "latest",
       "react": "latest",
       "react-dom": "latest",
-      "openseadragon": "^4.0.0",
-      "formidable": "^2.0.1"
+      "formidable": "^2.0.1",
+      "openseadragon": "^4.0.0"
     }
   }
   

@@ -10,38 +10,38 @@ export const config = {
   },
 };
 
-const uploadDir = path.join(process.cwd(), "/public/uploads");
+// Use the /tmp directory on Vercel
+const uploadDir = path.join("/tmp", "/uploads");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 const uploadHandler = async (req, res) => {
-  try {
-    const form = new formidable.IncomingForm({
-      uploadDir,
-      keepExtensions: true,
-      maxFileSize: 5 * 1024 * 1024 * 1024, // 5 GB
-    });
+  const form = new formidable.IncomingForm({
+    uploadDir,
+    keepExtensions: true,
+    maxFileSize: 512 * 1024 * 1024, // Limit of 512 MB
+  });
 
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        console.error("Formidable Error:", err); // Log server-side error
-        return res.status(500).json({ error: err.message });
-      }
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.error("Formidable Error:", err);
+      return res.status(500).json({ error: err.message });
+    }
 
-      console.log("Files received:", files); // Log received files
+    const fileKey = Object.keys(files)[0];
+    if (!fileKey) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-      const file = files.file[0];
-      const relativePath = `/uploads/${file.newFilename}`;
-      console.log("File saved at:", relativePath); // Log where file is saved
+    const file = files[fileKey];
+    const relativePath = `/uploads/${file.newFilename}`;
+    const filePath = path.join(uploadDir, file.newFilename);
 
-      return res.status(200).json({ message: "Upload successful", filePath: relativePath });
-    });
-  } catch (error) {
-    console.error("Unexpected Server Error:", error);
-    return res.status(500).json({ error: "Unexpected server error occurred." });
-  }
+    console.log("File saved at:", filePath);
+    return res.status(200).json({ message: "Upload successful", filePath });
+  });
 };
 
 export default uploadHandler;

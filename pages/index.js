@@ -5,22 +5,20 @@ import { useState } from "react";
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [filePath, setFilePath] = useState("");
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const validTypes = [".svs", ".ndpi"];
-    const fileType = file.name.slice(file.name.lastIndexOf("."));
-
-    if (!validTypes.includes(fileType.toLowerCase())) {
-      alert("Invalid file type. Please upload a .svs or .ndpi file.");
-      setSelectedFile(null);
-    } else {
-      setSelectedFile(file);
-    }
+    setSelectedFile(event.target.files[0]);
   };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
+
+    // Check if file size is within Vercel's /tmp limit
+    if (selectedFile.size > 512 * 1024 * 1024) {
+      alert("File size must be below 512 MB");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -31,17 +29,15 @@ export default function Home() {
         body: formData,
       });
 
-      // Check if the response is not okay or if content-type is not JSON
       if (!response.ok) {
-        const errorMessage = await response.text();
-        console.error("Upload Error:", errorMessage);
-        setUploadStatus(`Upload failed: ${errorMessage}`);
+        const errorData = await response.text();
+        console.error("Upload Error:", errorData);
+        setUploadStatus(`Upload failed: ${errorData}`);
         return;
       }
 
-      // Try to parse the JSON response
       const result = await response.json();
-      console.log("Upload successful. File path:", result.filePath); // Log success
+      setFilePath(result.filePath);
       setUploadStatus("Upload successful!");
     } catch (error) {
       console.error("Upload Failed:", error);
@@ -51,11 +47,17 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Whole Slide Image Uploader</h1>
+      <h1>Upload a Whole Slide Image</h1>
       <input type="file" onChange={handleFileChange} accept=".svs,.ndpi" />
       <button onClick={handleUpload}>Upload</button>
 
       {uploadStatus && <p>{uploadStatus}</p>}
+      {filePath && (
+        <div>
+          <h2>Uploaded File Path:</h2>
+          <p>{filePath}</p>
+        </div>
+      )}
     </div>
   );
 }
